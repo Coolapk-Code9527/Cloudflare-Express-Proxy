@@ -1,9 +1,9 @@
-name: 混淆 worker.js 并自动提交
+name: 混淆 明文源码.js 并自动提交
 
 on:
   # push:
   #   paths:
-  #     - 'worker.js' # 监听 worker.js 文件变更自动触发（如需自动触发请取消注释）
+  #     - '明文源码.js' # 监听 明文源码.js 文件变更自动触发（如需自动触发请取消注释）
   workflow_dispatch: # 支持手动触发
 
 jobs:
@@ -28,11 +28,11 @@ jobs:
       - name: 安装混淆依赖
         run: npm install -g javascript-obfuscator
 
-      # 步骤4：对 worker.js 进行混淆，输出为 _worker.js
+      # 步骤4：对 明文源码.js 进行混淆，输出为 _worker.js
       # 参数已根据项目体积和安全性优化，兼顾性能
-      - name: 混淆 worker.js
+      - name: 混淆 明文源码.js
         run: |
-          javascript-obfuscator worker.js --output _worker.js \
+          javascript-obfuscator 明文源码.js --output _worker.js \
           --compact true \
           --control-flow-flattening true \
           --control-flow-flattening-threshold 0.8 \
