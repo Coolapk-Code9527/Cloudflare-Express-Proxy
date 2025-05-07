@@ -1,4 +1,4 @@
-name: 混淆 明文源码.js 并自动提交
+name: 混淆 worker.js 并输出混淆worker.js
 
 on:
   # push:
@@ -28,11 +28,11 @@ jobs:
       - name: 安装混淆依赖
         run: npm install -g javascript-obfuscator
 
-      # 步骤4：对 明文源码.js 进行混淆，输出为 _worker.js（Cloudflare Pages Worker 入口文件）
+      # 步骤4：对 worker.js 进行混淆，输出为 混淆worker.js（Cloudflare Pages Worker 入口文件）
       # 参数已根据项目体积和安全性优化，兼顾性能
-      - name: 混淆 明文源码.js
+      - name: 混淆 worker.js
         run: |
-          javascript-obfuscator 明文源码.js --output _worker.js \
+          javascript-obfuscator worker.js --output 混淆worker.js \
           --compact true \
           --control-flow-flattening true \
           --control-flow-flattening-threshold 0.8 \
@@ -46,13 +46,13 @@ jobs:
           --transform-object-keys true \
           --unicode-escape-sequence true
 
-      # 步骤5：将混淆后的 _worker.js 提交到仓库
+      # 步骤5：将混淆后的 混淆worker.js 提交到仓库
       - name: 提交混淆文件
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add _worker.js
-          git commit -m "自动混淆 _worker.js" || echo "无变更无需提交"
+          git add 混淆worker.js
+          git commit -m "自动混淆 混淆worker.js" || echo "无变更无需提交"
 
       # 步骤6：推送更改到当前分支
       - name: 推送更改
