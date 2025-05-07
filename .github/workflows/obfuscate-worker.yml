@@ -1,10 +1,10 @@
-name: 混淆 明文源码.js 并自动提交
+name: Obfuscate and Commit
 
 on:
-  # push:
-  #   paths:
-  #     - '明文源码.js' # 监听 明文源码.js 文件变更自动触发（如需自动触发请取消注释）
-  workflow_dispatch: # 支持手动触发
+    #push:
+    #    paths:
+    #        - '明文源码.js'
+    workflow_dispatch:
 
 jobs:
   obfuscate:
@@ -13,50 +13,43 @@ jobs:
       contents: write
 
     steps:
-      # 步骤1：检出仓库代码
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 拉取全部提交历史，便于后续提交
+          fetch-depth: 0
 
-      # 步骤2：设置 Node.js 环境
-      - name: 设置 Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "16"
 
-      # 步骤3：全局安装 javascript-obfuscator 混淆工具
-      - name: 安装混淆依赖
+      - name: Install dependencies
         run: npm install -g javascript-obfuscator
 
-      # 步骤4：对 明文源码.js 进行混淆，输出为 _worker.js（Cloudflare Pages Worker 入口文件）
-      # 参数已根据项目体积和安全性优化，兼顾性能
-      - name: 混淆 明文源码.js
+      - name: Obfuscate code
         run: |
           javascript-obfuscator 明文源码.js --output _worker.js \
           --compact true \
           --control-flow-flattening true \
-          --control-flow-flattening-threshold 0.8 \
+          --control-flow-flattening-threshold 1 \
           --dead-code-injection true \
-          --dead-code-injection-threshold 0.5 \
+          --dead-code-injection-threshold 1 \
           --identifier-names-generator hexadecimal \
           --rename-globals true \
           --string-array true \
           --string-array-encoding 'rc4' \
-          --string-array-threshold 0.8 \
+          --string-array-threshold 1 \
           --transform-object-keys true \
           --unicode-escape-sequence true
 
-      # 步骤5：将混淆后的 _worker.js 提交到仓库
-      - name: 提交混淆文件
+      - name: Commit changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add _worker.js
-          git commit -m "自动混淆 _worker.js" || echo "无变更无需提交"
+          git commit -m "Obfuscate _worker.js" || echo "No changes to commit"
 
-      # 步骤6：推送更改到当前分支
-      - name: 推送更改
+      - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }} 
+          branch: ${{ github.ref }}
